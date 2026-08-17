@@ -11,7 +11,7 @@ export default function Booking() {
   const [done, setDone] = useState(false);
 
   return (
-    <div className="pt-32 pb-24 md:pb-40">
+    <div className="pt-24 pb-24 md:pt-32 md:pb-40">
       <section className="mx-auto max-w-3xl px-6 md:px-12">
         <Reveal>
           <span className="text-xs tracking-[0.3em] uppercase text-gold mb-5 block">Buchung</span>
@@ -28,7 +28,7 @@ export default function Booking() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="glass p-10 md:p-16 text-center"
+              className="glass p-6 sm:p-10 md:p-16 text-center"
             >
               <div className="mx-auto mb-8 h-16 w-16 rounded-full border border-gold flex items-center justify-center">
                 <Check size={28} className="text-gold" />

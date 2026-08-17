@@ -63,7 +63,7 @@ export default function Contact() {
               href={whatsappUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-3 h-14 px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-3 h-14 px-4 sm:px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors"
             >
               <MessageCircle size={18} /> Über WhatsApp kontaktieren
             </a>
@@ -120,7 +120,7 @@ function ContactRow({ icon: Icon, label, value, href }) {
       </div>
     </div>
   );
-  return href ? <li><a href={href} target="_blank" rel="noreferrer" className="block">{content}</a></li> : <li>{content}</li>;
+  return href ? <li><a href={href} target="_blank" rel="noreferrer" className="flex min-h-11 items-center py-2">{content}</a></li> : <li>{content}</li>;
 }
 
 function Field({ label, children }) {

@@ -10,7 +10,7 @@ export default function Hero({ content }) {
   const subheadline = content?.hero_subheadline || 'Exklusive VIP Taxi Services für Flughafentransfers, Geschäftstermine, Events und individuelle Fahrten. Komfortabel, diskret und zuverlässig.';
 
   return (
-    <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
+    <section className="relative h-screen min-h-[600px] supports-[height:100svh]:h-svh sm:min-h-[640px] w-full overflow-hidden">
       <div className="absolute inset-0">
         <Image
           src={HERO_IMG}
@@ -33,7 +33,7 @@ export default function Hero({ content }) {
           className="max-w-2xl"
         >
           <span className="block text-xs tracking-[0.3em] uppercase text-gold mb-6">LuxDrive</span>
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[0.95] text-ivory text-shadow-lux">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-[0.95] text-ivory text-shadow-lux">
             {headline}
           </h1>
           <p className="mt-8 text-lg md:text-xl text-lunar max-w-xl leading-relaxed">
@@ -45,7 +45,7 @@ export default function Hero({ content }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute bottom-12 right-6 md:right-12 glass px-8 py-6 max-w-xs"
+          className="absolute bottom-8 left-6 right-6 glass px-6 py-5 sm:bottom-12 sm:left-auto sm:right-6 sm:max-w-xs sm:px-8 sm:py-6 md:right-12"
         >
           <Link to="/booking" className="group flex items-center justify-between gap-4">
             <div>
@@ -57,7 +57,7 @@ export default function Hero({ content }) {
         </motion.div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
         <span className="text-[10px] tracking-[0.3em] uppercase text-lunar">Scrollen</span>
         <span className="h-10 w-px bg-gradient-to-b from-gold/60 to-transparent" />
       </div>

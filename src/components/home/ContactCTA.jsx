@@ -31,7 +31,7 @@ export default function ContactCTA() {
         >
           <Link
             to="/booking"
-            className="group inline-flex items-center gap-3 h-14 px-10 bg-gold text-obsidian text-xs tracking-[0.25em] uppercase hover:bg-gold-light transition-colors duration-300"
+            className="group inline-flex w-full max-w-sm items-center justify-center gap-3 h-14 px-4 sm:w-auto sm:px-10 bg-gold text-obsidian text-xs tracking-[0.25em] uppercase hover:bg-gold-light transition-colors duration-300"
           >
             Jetzt VIP Taxi buchen
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />

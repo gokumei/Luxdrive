@@ -26,7 +26,7 @@ export default function VehicleCard({ vehicle }) {
         <h3 className="font-display text-2xl md:text-3xl text-ivory mb-2">{vehicle.name}</h3>
         {vehicle.description && <p className="text-lunar text-sm leading-relaxed mb-6">{vehicle.description}</p>}
 
-        <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-white/5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 pb-6 border-b border-white/5">
           <div className="flex items-center gap-2 text-lunar text-sm">
             <Users size={16} className="text-gold" /> {vehicle.passenger_capacity} Fahrgäste
           </div>
@@ -45,14 +45,14 @@ export default function VehicleCard({ vehicle }) {
           </ul>
         )}
 
-        <div className="mt-auto flex items-end justify-between">
+        <div className="mt-auto flex flex-col items-stretch gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-1">Ab</span>
             <span className="font-display text-3xl text-gold">${vehicle.starting_price}</span>
           </div>
           <Link
             to={`/booking/${encodeURIComponent(vehicle.name)}`}
-            className={`inline-flex items-center justify-center h-12 px-6 text-xs tracking-[0.2em] uppercase transition-all duration-300 ${
+            className={`inline-flex w-full items-center justify-center h-12 px-4 sm:w-auto sm:px-6 text-xs tracking-[0.2em] uppercase transition-all duration-300 ${
               vehicle.available
                 ? 'border border-gold/40 text-gold hover:bg-gold hover:text-obsidian'
                 : 'border border-white/10 text-lunar pointer-events-none opacity-50'

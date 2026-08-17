@@ -113,29 +113,31 @@ export default function ReviewForm() {
                 Ihre Sternebewertung
               </legend>
               <div
-                className="flex items-center gap-2"
+                className="flex flex-col items-start gap-3"
                 onMouseLeave={() => setHoveredRating(0)}
               >
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-label={value === 1 ? '1 Stern' : `${value} Sterne`}
-                    aria-pressed={rating === value}
-                    onClick={() => setRating(value)}
-                    onMouseEnter={() => setHoveredRating(value)}
-                    onFocus={() => setHoveredRating(value)}
-                    onBlur={() => setHoveredRating(0)}
-                    className="p-1 text-lunar hover:text-gold focus-visible:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-sm transition-colors"
-                  >
-                    <Star
-                      size={30}
-                      className={value <= visibleRating ? 'fill-gold text-gold' : 'text-lunar'}
-                    />
-                  </button>
-                ))}
+                <div className="flex items-center gap-0">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-label={value === 1 ? '1 Stern' : `${value} Sterne`}
+                      aria-pressed={rating === value}
+                      onClick={() => setRating(value)}
+                      onMouseEnter={() => setHoveredRating(value)}
+                      onFocus={() => setHoveredRating(value)}
+                      onBlur={() => setHoveredRating(0)}
+                      className="h-11 w-11 inline-flex items-center justify-center text-lunar hover:text-gold focus-visible:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 rounded-sm transition-colors"
+                    >
+                      <Star
+                        size={30}
+                        className={value <= visibleRating ? 'fill-gold text-gold' : 'text-lunar'}
+                      />
+                    </button>
+                  ))}
+                </div>
                 {rating > 0 && (
-                  <span className="ml-3 text-sm text-lunar" aria-live="polite">
+                  <span className="text-sm text-lunar" aria-live="polite">
                     {rating} von 5 Sternen
                   </span>
                 )}

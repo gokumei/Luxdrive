@@ -122,6 +122,12 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
 
     <div className="glass p-6 md:p-10">
       {/* Stepper */}
+      <div className="mb-5 md:hidden" aria-live="polite">
+        <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar">
+          Schritt {step + 1} von {STEPS.length}
+        </span>
+        <span className="mt-1 block font-display text-xl text-ivory">{STEPS[step]}</span>
+      </div>
       <div className="flex items-center justify-between mb-10">
         {STEPS.map((s, i) => (
           <div key={s} className="flex items-center flex-1">
@@ -140,27 +146,27 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
         {step === 0 && (
           <motion.div key="journey" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
-              <Field icon={MapPin} label="Abholort">
-                <input className={inputCls} value={form.pickup_location} onChange={(e) => set('pickup_location', e.target.value)} placeholder="Flughafen, Hotel, Adresse …" />
+              <Field id="booking-pickup" icon={MapPin} label="Abholort">
+                <input id="booking-pickup" autoComplete="street-address" className={inputCls} value={form.pickup_location} onChange={(e) => set('pickup_location', e.target.value)} placeholder="Flughafen, Hotel, Adresse …" />
               </Field>
-              <Field icon={MapPin} label="Ziel">
-                <input className={inputCls} value={form.destination} onChange={(e) => set('destination', e.target.value)} placeholder="Wohin soll die Fahrt gehen?" />
-              </Field>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <Field icon={Calendar} label="Abholdatum">
-                <input type="date" className={inputCls} value={form.date} onChange={(e) => set('date', e.target.value)} />
-              </Field>
-              <Field icon={Clock} label="Abholzeit">
-                <input type="time" className={inputCls} value={form.time} onChange={(e) => set('time', e.target.value)} />
+              <Field id="booking-destination" icon={MapPin} label="Ziel">
+                <input id="booking-destination" autoComplete="off" className={inputCls} value={form.destination} onChange={(e) => set('destination', e.target.value)} placeholder="Wohin soll die Fahrt gehen?" />
               </Field>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              <Field icon={Users} label="Anzahl Fahrgäste">
-                <input type="number" min="1" className={inputCls} value={form.passengers} onChange={(e) => set('passengers', e.target.value)} />
+              <Field id="booking-date" icon={Calendar} label="Abholdatum">
+                <input id="booking-date" type="date" className={inputCls} value={form.date} onChange={(e) => set('date', e.target.value)} />
               </Field>
-              <Field icon={Luggage} label="Anzahl Gepäckstücke">
-                <input type="number" min="0" className={inputCls} value={form.suitcases} onChange={(e) => set('suitcases', e.target.value)} />
+              <Field id="booking-time" icon={Clock} label="Abholzeit">
+                <input id="booking-time" type="time" className={inputCls} value={form.time} onChange={(e) => set('time', e.target.value)} />
+              </Field>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              <Field id="booking-passengers" icon={Users} label="Anzahl Fahrgäste">
+                <input id="booking-passengers" type="number" inputMode="numeric" min="1" className={inputCls} value={form.passengers} onChange={(e) => set('passengers', e.target.value)} />
+              </Field>
+              <Field id="booking-suitcases" icon={Luggage} label="Anzahl Gepäckstücke">
+                <input id="booking-suitcases" type="number" inputMode="numeric" min="0" className={inputCls} value={form.suitcases} onChange={(e) => set('suitcases', e.target.value)} />
               </Field>
             </div>
           </motion.div>
@@ -196,14 +202,14 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
         {step === 2 && (
           <motion.div key="profile" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
-              <Field label="Vorname"><input className={inputCls} value={form.first_name} onChange={(e) => set('first_name', e.target.value)} /></Field>
-              <Field label="Nachname"><input className={inputCls} value={form.last_name} onChange={(e) => set('last_name', e.target.value)} /></Field>
+              <Field id="booking-first-name" label="Vorname"><input id="booking-first-name" autoComplete="given-name" className={inputCls} value={form.first_name} onChange={(e) => set('first_name', e.target.value)} /></Field>
+              <Field id="booking-last-name" label="Nachname"><input id="booking-last-name" autoComplete="family-name" className={inputCls} value={form.last_name} onChange={(e) => set('last_name', e.target.value)} /></Field>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              <Field label="E-Mail"><input type="email" className={inputCls} value={form.email} onChange={(e) => set('email', e.target.value)} /></Field>
-              <Field label="Telefonnummer"><input className={inputCls} value={form.phone_number} onChange={(e) => set('phone_number', e.target.value)} /></Field>
+              <Field id="booking-email" label="E-Mail"><input id="booking-email" type="email" inputMode="email" autoComplete="email" className={inputCls} value={form.email} onChange={(e) => set('email', e.target.value)} /></Field>
+              <Field id="booking-phone" label="Telefonnummer"><input id="booking-phone" type="tel" inputMode="tel" autoComplete="tel" className={inputCls} value={form.phone_number} onChange={(e) => set('phone_number', e.target.value)} /></Field>
             </div>
-            <Field icon={Plane} label="Flugnummer (optional)"><input className={inputCls} value={form.flight_number} onChange={(e) => set('flight_number', e.target.value)} /></Field>
+            <Field id="booking-flight-number" icon={Plane} label="Flugnummer (optional)"><input id="booking-flight-number" type="text" autoComplete="off" className={inputCls} value={form.flight_number} onChange={(e) => set('flight_number', e.target.value)} /></Field>
 
             <div className="grid sm:grid-cols-2 gap-3 pt-2">
               <Toggle icon={Baby} label="Kindersitz" active={form.child_seat} onClick={() => set('child_seat', !form.child_seat)} />
@@ -212,29 +218,29 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
               <Toggle icon={GitBranch} label="Zwischenstopps" active={form.extra_stops} onClick={() => set('extra_stops', !form.extra_stops)} />
             </div>
 
-            <Field label="Besondere Wünsche"><textarea rows={3} className={inputCls + ' resize-none'} value={form.special_requests} onChange={(e) => set('special_requests', e.target.value)} /></Field>
+            <Field id="booking-special-requests" label="Besondere Wünsche"><textarea id="booking-special-requests" rows={3} className={inputCls + ' resize-none'} value={form.special_requests} onChange={(e) => set('special_requests', e.target.value)} /></Field>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Footer */}
-      <div className="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="text-left">
+      <div className="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="text-left self-start sm:self-auto">
           <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar">Geschätzter Preis</span>
           <span className="font-display text-3xl text-gold">{estimatedPrice ? `$${estimatedPrice}` : '—'}</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:items-center">
           {step > 0 && (
-            <button onClick={back} className="h-12 px-6 text-xs tracking-[0.2em] uppercase text-lunar hover:text-ivory border border-white/10 transition-colors inline-flex items-center gap-2">
+            <button onClick={back} className="h-12 w-full px-6 text-xs tracking-[0.2em] uppercase text-lunar hover:text-ivory border border-white/10 transition-colors inline-flex items-center justify-center gap-2 sm:w-auto">
               <ChevronLeft size={16} /> Zurück
             </button>
           )}
           {step < 2 ? (
-            <button onClick={next} className="h-12 px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors inline-flex items-center gap-2">
+            <button onClick={next} className="h-12 w-full px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors inline-flex items-center justify-center gap-2 sm:w-auto">
               Weiter <ChevronRight size={16} />
             </button>
           ) : (
-            <button onClick={submit} disabled={submitting} className="h-12 px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors inline-flex items-center gap-2 disabled:opacity-50">
+            <button onClick={submit} disabled={submitting} className="h-12 w-full px-5 sm:px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-50 sm:w-auto">
               {submitting ? 'Wird gesendet …' : 'Jetzt VIP Taxi buchen'}
             </button>
           )}
@@ -246,16 +252,17 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
 
 /**
  * @param {{
+ *   id: string,
  *   icon?: React.ElementType,
  *   label: React.ReactNode,
  *   children: React.ReactNode
  * }} props
  */
-function Field({ icon: Icon, label, children }) {
+function Field({ id, icon: Icon, label, children }) {
   const labelCls = 'block text-[10px] tracking-[0.25em] uppercase text-lunar mb-2';
   return (
     <div>
-      <label className={labelCls + ' flex items-center gap-2'}>
+      <label htmlFor={id} className={labelCls + ' flex items-center gap-2'}>
         {Icon && <Icon size={12} className="text-gold" />} {label}
       </label>
       {children}

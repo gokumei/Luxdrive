@@ -23,17 +23,17 @@ export default function Intro({ content }) {
           <span className="text-xs tracking-[0.3em] uppercase text-gold mb-6 block">Über LuxDrive</span>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-ivory leading-[1.05] mb-8">{title}</h2>
           <p className="text-lunar text-lg leading-[1.8] mb-8">{body}</p>
-          <div className="flex items-center gap-8 pt-6 border-t border-white/5">
+          <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8 pt-6 border-t border-white/5">
             <div>
               <div className="font-display text-2xl text-gold">Pünktlich</div>
               <div className="text-xs tracking-[0.2em] uppercase text-lunar mt-1">Zuverlässige Planung</div>
             </div>
-            <div className="h-10 w-px bg-white/10" />
+            <div className="hidden md:block h-10 w-px bg-white/10" />
             <div>
               <div className="font-display text-2xl text-gold">Komfortabel</div>
               <div className="text-xs tracking-[0.2em] uppercase text-lunar mt-1">Hochwertige VIP-Fahrzeuge</div>
             </div>
-            <div className="h-10 w-px bg-white/10" />
+            <div className="hidden md:block h-10 w-px bg-white/10" />
             <div>
               <div className="font-display text-2xl text-gold">Diskret</div>
               <div className="text-xs tracking-[0.2em] uppercase text-lunar mt-1">Professioneller Service</div>

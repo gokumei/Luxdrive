@@ -61,7 +61,7 @@ export default function Navbar() {
             </Link>
             <button
               onClick={() => setOpen(true)}
-              className="lg:hidden text-ivory"
+              className="lg:hidden h-11 w-11 inline-flex items-center justify-center text-ivory"
               aria-label="Menü öffnen"
             >
               <Menu size={24} />
@@ -87,7 +87,7 @@ export default function Navbar() {
                   className="h-10 w-36 object-contain object-left"
                 />
               </Link>
-              <button onClick={() => setOpen(false)} className="text-ivory" aria-label="Menü schließen">
+              <button onClick={() => setOpen(false)} className="h-11 w-11 inline-flex items-center justify-center text-ivory" aria-label="Menü schließen">
                 <X size={26} />
               </button>
             </div>

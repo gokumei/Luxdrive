@@ -3,10 +3,13 @@ import { Users, Briefcase, ArrowUpRight } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import Reveal from '@/components/Reveal';
 import { useVehicles } from '@/lib/useContent';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { localizeVehicle } from '@/i18n/dbContent';
 
 export default function FleetPreview() {
+  const { language, t } = useLanguage();
   const { vehicles } = useVehicles();
-  const featured = vehicles.slice(0, 3);
+  const featured = vehicles.slice(0, 3).map((vehicle) => localizeVehicle(vehicle, language));
 
   return (
     <section className="py-24 md:py-40 border-t border-white/5">
@@ -14,12 +17,12 @@ export default function FleetPreview() {
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div>
-              <span className="text-xs tracking-[0.3em] uppercase text-gold mb-4 block">Flotte</span>
-              <h2 className="font-display text-4xl md:text-6xl text-ivory leading-[1.05]">Unsere Premium-Fahrzeuge</h2>
-              <p className="mt-5 text-lunar text-lg">Komfort und Qualität für jede Fahrt.</p>
+              <span className="text-xs tracking-[0.3em] uppercase text-gold mb-4 block">{t('common.fleet')}</span>
+              <h2 className="font-display text-4xl md:text-6xl text-ivory leading-[1.05]">{t('fleet.title')}</h2>
+              <p className="mt-5 text-lunar text-lg">{t('home.fleetSubtitle')}</p>
             </div>
             <Link to="/fleet" className="group inline-flex items-center gap-2 text-sm tracking-[0.2em] uppercase text-lunar hover:text-gold transition-colors">
-              Gesamte Flotte ansehen <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              {t('home.viewFleet')} <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
           </div>
         </Reveal>
@@ -42,7 +45,7 @@ export default function FleetPreview() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
-                  <span className="text-xs tracking-[0.2em] uppercase text-lunar">Ab</span>
+                  <span className="text-xs tracking-[0.2em] uppercase text-lunar">{t('fleet.startingAt')}</span>
                   <span className="font-display text-2xl text-gold">${v.starting_price}</span>
                 </div>
               </Link>

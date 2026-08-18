@@ -5,10 +5,12 @@ import { toast } from "sonner";
 
 import AuthLayout from "@/components/AuthLayout";
 import { useAuth } from "@/lib/AuthContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLanguage();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,16 +38,12 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          response.status === 401
-            ? "Ungültige E-Mail-Adresse oder ungültiges Passwort"
-            : "Anmeldung fehlgeschlagen"
-        );
+        throw new Error(response.status === 401 ? "INVALID_CREDENTIALS" : "LOGIN_FAILED");
       }
 
       login(data.user, data.token);
 
-      toast.success("Anmeldung erfolgreich");
+      toast.success(t('auth.login.success'));
 
       if (data.user?.role === "admin") {
         navigate("/admin");
@@ -54,9 +52,9 @@ export default function Login() {
       }
     } catch (err) {
       console.error(err);
-      const message = err.message === "Ungültige E-Mail-Adresse oder ungültiges Passwort"
-        ? err.message
-        : "Anmeldung fehlgeschlagen";
+      const message = err.message === "INVALID_CREDENTIALS"
+        ? t('auth.login.invalid')
+        : t('auth.login.failed');
       setError(message);
       toast.error(message);
     } finally {
@@ -67,16 +65,16 @@ export default function Login() {
   return (
     <AuthLayout
       icon={LogIn}
-      title="Willkommen zurück"
-      subtitle="Melden Sie sich bei Ihrem Konto an"
+      title={t('auth.login.title')}
+      subtitle={t('auth.login.subtitle')}
       footer={
         <>
-          Sie haben noch kein Konto?{" "}
+          {t('auth.login.noAccount')}{" "}
           <Link
             to="/register"
             className="text-primary font-medium hover:underline"
           >
-            Konto erstellen
+            {t('auth.login.create')}
           </Link>
         </>
       }
@@ -93,7 +91,7 @@ export default function Login() {
             htmlFor="email"
             className="text-sm font-medium text-ivory"
           >
-            E-Mail
+            {t('common.email')}
           </label>
 
           <div className="relative">
@@ -122,13 +120,13 @@ export default function Login() {
               htmlFor="password"
               className="text-sm font-medium text-ivory"
             >
-              Passwort
+              {t('auth.login.password')}
             </label>
             <Link
               to="/forgot-password"
               className="text-sm text-gold hover:text-gold-light transition-colors"
             >
-              Passwort vergessen?
+              {t('auth.login.forgot')}
             </Link>
           </div>
 
@@ -159,10 +157,10 @@ export default function Login() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Anmeldung läuft …
+              {t('auth.login.loading')}
             </>
           ) : (
-            "Anmelden"
+            t('auth.login.submit')
           )}
         </button>
       </form>

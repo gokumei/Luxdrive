@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function ForgotPassword() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -33,14 +35,14 @@ export default function ForgotPassword() {
       await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error("Link zum Zurücksetzen konnte nicht angefordert werden");
+        throw new Error("RESET_REQUEST_FAILED");
       }
 
-      setMessage("Wenn ein Konto mit dieser E-Mail-Adresse existiert, wurde ein Link zum Zurücksetzen des Passworts gesendet.");
+      setMessage(t('auth.forgot.success'));
       setSent(true);
     } catch (err) {
       console.error(err);
-      setError("Link zum Zurücksetzen konnte nicht angefordert werden");
+      setError(t('auth.forgot.failed'));
     } finally {
       setLoading(false);
     }
@@ -49,11 +51,11 @@ export default function ForgotPassword() {
   return (
     <AuthLayout
       icon={Mail}
-      title="Passwort zurücksetzen"
-      subtitle="Wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts."
+      title={t('auth.forgot.title')}
+      subtitle={t('auth.forgot.subtitle')}
       footer={
         <Link to="/login" className="text-primary font-medium hover:underline">
-          <ArrowLeft className="w-3 h-3 inline mr-1" />Zurück zur Anmeldung
+          <ArrowLeft className="w-3 h-3 inline mr-1" />{t('auth.forgot.back')}
         </Link>
       }
     >
@@ -69,7 +71,7 @@ export default function ForgotPassword() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">E-Mail-Adresse</Label>
+            <Label htmlFor="email">{t('auth.forgot.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
               <Input
@@ -89,10 +91,10 @@ export default function ForgotPassword() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Wird gesendet …
+                {t('auth.forgot.loading')}
               </>
             ) : (
-              "Link zum Zurücksetzen senden"
+              t('auth.forgot.submit')
             )}
           </Button>
         </form>

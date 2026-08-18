@@ -3,6 +3,7 @@ import { Toaster as SonnerToaster } from "sonner"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -20,6 +21,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import { LanguageProvider } from '@/i18n/LanguageContext';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -37,7 +39,7 @@ const AuthenticatedApp = () => {
   // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
+      return <LanguageProvider><UserNotRegisteredError /></LanguageProvider>;
     } else if (authError.type === 'auth_required') {
       // Redirect to login automatically
       navigateToLogin();
@@ -48,7 +50,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route element={<LanguageProvider><Layout /></LanguageProvider>}>
         <Route path="/" element={<Home />} />
         <Route path="/fleet" element={<Fleet />} />
         <Route path="/booking" element={<Booking />} />
@@ -56,17 +58,24 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
       </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/login" element={<LanguageProvider><Login /></LanguageProvider>} />
+      <Route path="/register" element={<LanguageProvider><Register /></LanguageProvider>} />
+      <Route path="/forgot-password" element={<LanguageProvider><ForgotPassword /></LanguageProvider>} />
+      <Route path="/reset-password" element={<LanguageProvider><ResetPassword /></LanguageProvider>} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminLanguageBoundary><AdminDashboard /></AdminLanguageBoundary>} />
       </Route>
-      <Route path="*" element={<PageNotFound />} />
+      <Route path="*" element={<LanguageProvider><PageNotFound /></LanguageProvider>} />
     </Routes>
   );
 };
+
+function AdminLanguageBoundary({ children }) {
+  useEffect(() => {
+    document.documentElement.lang = 'de';
+  }, []);
+  return children;
+}
 
 
 function App() {

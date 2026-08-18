@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, Loader2, AlertTriangle } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function ResetPassword() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resetToken = searchParams.get("token");
@@ -20,7 +22,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
     if (newPassword !== confirmPassword) {
-      setError("Die Passwörter stimmen nicht überein");
+      setError(t('auth.reset.mismatch'));
       return;
     }
     setLoading(true);
@@ -42,13 +44,13 @@ export default function ResetPassword() {
       await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error("Passwort konnte nicht zurückgesetzt werden");
+        throw new Error("PASSWORD_RESET_FAILED");
       }
 
       navigate("/login", { replace: true });
     } catch (err) {
       console.error(err);
-      setError("Passwort konnte nicht zurückgesetzt werden");
+      setError(t('auth.reset.failed'));
     } finally {
       setLoading(false);
     }
@@ -58,16 +60,16 @@ export default function ResetPassword() {
     return (
       <AuthLayout
         icon={AlertTriangle}
-        title="Ungültiger Link"
-        subtitle="Dieser Link zum Zurücksetzen des Passworts fehlt oder ist ungültig."
+        title={t('auth.reset.invalidTitle')}
+        subtitle={t('auth.reset.invalidSubtitle')}
         footer={
           <Link to="/forgot-password" className="text-primary font-medium hover:underline">
-            Neuen Link anfordern
+            {t('auth.reset.requestNew')}
           </Link>
         }
       >
         <p className="text-sm text-foreground text-center">
-          Der verwendete Link scheint unvollständig zu sein. Bitte fordern Sie einen neuen Link zum Zurücksetzen des Passworts an.
+          {t('auth.reset.invalidBody')}
         </p>
       </AuthLayout>
     );
@@ -76,8 +78,8 @@ export default function ResetPassword() {
   return (
     <AuthLayout
       icon={Lock}
-      title="Neues Passwort"
-      subtitle="Geben Sie unten Ihr neues Passwort ein."
+      title={t('auth.reset.title')}
+      subtitle={t('auth.reset.subtitle')}
     >
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -86,7 +88,7 @@ export default function ResetPassword() {
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="password">Neues Passwort</Label>
+          <Label htmlFor="password">{t('auth.reset.password')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -103,7 +105,7 @@ export default function ResetPassword() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm">Passwort bestätigen</Label>
+          <Label htmlFor="confirm">{t('auth.reset.confirm')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -122,10 +124,10 @@ export default function ResetPassword() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Passwort wird zurückgesetzt …
+              {t('auth.reset.loading')}
             </>
           ) : (
-            "Passwort zurücksetzen"
+            t('auth.reset.submit')
           )}
         </Button>
       </form>

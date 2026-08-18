@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Phone, Mail, MessageCircle, Clock, Send, UserRound } from 'lucide-react';
 import Reveal from '@/components/Reveal';
 import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
-
-/** @type {import("leaflet").LatLngTuple} */
-const MAP_CENTER = [40.7589, -73.9851];
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export default function Contact() {
+  const { t } = useLanguage();
   const { content } =
     /** @type {import("@/lib/useContent").SiteOutletContext} */ (useOutletContext());
   const phone = content?.company_phone || '+4917662538838';
@@ -18,19 +15,19 @@ export default function Contact() {
   const whatsapp = content?.whatsapp_number || '+4917662538838';
   const whatsappDisplay = whatsapp === '+4917662538838' ? '+49 176 62538838' : whatsapp;
   const whatsappUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
-  const hours = content?.business_hours || '24 Stunden täglich, 7 Tage die Woche, 365 Tage im Jahr';
+  const hours = content?.business_hours || t('contact.hoursFallback');
 
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sending, setSending] = useState(false);
 
   const submit = (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) { toast.error('Bitte füllen Sie alle Felder aus.'); return; }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) { toast.error('Bitte geben Sie eine gültige E-Mail-Adresse ein.'); return; }
+    if (!form.name || !form.email || !form.message) { toast.error(t('contact.allFields')); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) { toast.error(t('contact.invalidEmail')); return; }
     setSending(true);
     setTimeout(() => {
       setSending(false);
-      toast.success('Nachricht erhalten. Wir melden uns in Kürze.');
+      toast.success(t('contact.sent'));
       setForm({ name: '', email: '', message: '' });
     }, 900);
   };
@@ -39,23 +36,23 @@ export default function Contact() {
     <div className="pt-32 pb-24 md:pb-40">
       <section className="mx-auto max-w-[1500px] px-6 md:px-12">
         <Reveal>
-          <span className="text-xs tracking-[0.3em] uppercase text-gold mb-5 block">Kontakt</span>
-          <h1 className="font-display text-5xl md:text-7xl text-ivory leading-[1.02] max-w-2xl">Kontakt zu LuxDrive</h1>
-          <p className="mt-5 text-lunar text-lg">Wir sind für Ihre Fahrt da.</p>
+          <span className="text-xs tracking-[0.3em] uppercase text-gold mb-5 block">{t('common.contact')}</span>
+          <h1 className="font-display text-5xl md:text-7xl text-ivory leading-[1.02] max-w-2xl">{t('contact.title')}</h1>
+          <p className="mt-5 text-lunar text-lg">{t('contact.subtitle')}</p>
         </Reveal>
       </section>
 
-      <section className="mt-16 mx-auto max-w-[1500px] px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+      <section className="mt-16 mx-auto max-w-6xl px-6 md:px-12 grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-start gap-12 lg:gap-20">
         <Reveal>
           <div className="space-y-8">
             <div>
-              <h2 className="text-xs tracking-[0.25em] uppercase text-gold mb-5">Kontaktdaten</h2>
+              <h2 className="text-xs tracking-[0.25em] uppercase text-gold mb-5">{t('contact.details')}</h2>
               <ul className="space-y-5">
-                <ContactRow icon={Phone} label="Telefon" value={phoneDisplay} href={`tel:${phone}`} />
-                <ContactRow icon={UserRound} label="Geschäftsführer" value="Resul Düzgün" />
-                <ContactRow icon={Mail} label="E-Mail" value={email} href={`mailto:${email}`} />
-                <ContactRow icon={MessageCircle} label="WhatsApp" value={whatsappDisplay} href={whatsappUrl} />
-                <ContactRow icon={Clock} label="Öffnungszeiten" value={hours} />
+                <ContactRow icon={Phone} label={t('common.phone')} value={phoneDisplay} href={`tel:${phone}`} />
+                <ContactRow icon={UserRound} label={t('contact.managingDirector')} value="Resul Düzgün" />
+                <ContactRow icon={Mail} label={t('common.email')} value={email} href={`mailto:${email}`} />
+                <ContactRow icon={MessageCircle} label={t('common.whatsapp')} value={whatsappDisplay} href={whatsappUrl} />
+                <ContactRow icon={Clock} label={t('contact.hours')} value={hours} />
               </ul>
             </div>
 
@@ -65,35 +62,26 @@ export default function Contact() {
               rel="noreferrer"
               className="inline-flex w-full sm:w-auto items-center justify-center gap-3 h-14 px-4 sm:px-8 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light transition-colors"
             >
-              <MessageCircle size={18} /> Über WhatsApp kontaktieren
+              <MessageCircle size={18} /> {t('contact.whatsappCta')}
             </a>
 
-            <div className="h-72 w-full overflow-hidden border border-white/10">
-              <MapContainer center={MAP_CENTER} zoom={13} scrollWheelZoom={false} className="h-full w-full" style={{ background: '#0A0A0A' }}>
-                <TileLayer
-                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                  attribution='&copy; OpenStreetMap &copy; CARTO'
-                />
-                <Marker position={MAP_CENTER} />
-              </MapContainer>
-            </div>
           </div>
         </Reveal>
 
         <Reveal delay={0.15}>
           <form onSubmit={submit} className="glass p-6 md:p-10 space-y-6">
-            <h2 className="font-display text-3xl text-ivory">Nachricht senden</h2>
-            <Field label="Ihr Name">
+            <h2 className="font-display text-3xl text-ivory">{t('contact.sendTitle')}</h2>
+            <Field label={t('contact.name')}>
               <input className="w-full bg-transparent border-b border-white/15 focus:border-gold py-3 text-ivory outline-none" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </Field>
-            <Field label="E-Mail">
+            <Field label={t('common.email')}>
               <input type="email" className="w-full bg-transparent border-b border-white/15 focus:border-gold py-3 text-ivory outline-none" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
-            <Field label="Nachricht">
+            <Field label={t('contact.message')}>
               <textarea rows={5} className="w-full bg-transparent border-b border-white/15 focus:border-gold py-3 text-ivory outline-none resize-none" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
             </Field>
             <button type="submit" disabled={sending} className="w-full h-14 bg-gold text-obsidian text-xs tracking-[0.25em] uppercase hover:bg-gold-light transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-50">
-              {sending ? 'Wird gesendet …' : <>Nachricht senden <Send size={16} /></>}
+              {sending ? t('common.sending') : <>{t('contact.sendTitle')} <Send size={16} /></>}
             </button>
           </form>
         </Reveal>

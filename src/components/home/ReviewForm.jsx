@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Star } from 'lucide-react';
 import { toast } from 'sonner';
 import Reveal from '@/components/Reveal';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const API_URL = 'http://localhost:5000/api/testimonials/submit';
 
 export default function ReviewForm() {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [review, setReview] = useState('');
   const [rating, setRating] = useState(0);
@@ -21,17 +23,17 @@ export default function ReviewForm() {
     const trimmedReview = review.trim();
 
     if (trimmedName.length < 2 || trimmedName.length > 100) {
-      toast.error('Bitte geben Sie Ihren Namen ein.');
+      toast.error(t('reviews.invalidName'));
       return;
     }
 
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      toast.error('Bitte wählen Sie eine Sternebewertung aus.');
+      toast.error(t('reviews.invalidRating'));
       return;
     }
 
     if (trimmedReview.length < 10 || trimmedReview.length > 1000) {
-      toast.error('Bitte schreiben Sie eine Bewertung mit mindestens 10 Zeichen.');
+      toast.error(t('reviews.invalidReview'));
       return;
     }
 
@@ -59,10 +61,10 @@ export default function ReviewForm() {
       setRating(0);
       setHoveredRating(0);
       setSuccess(true);
-      toast.success('Vielen Dank für Ihre Bewertung!');
+      toast.success(t('reviews.thanks'));
     } catch (error) {
       console.error('REVIEW SUBMISSION ERROR:', error);
-      toast.error('Die Bewertung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.');
+      toast.error(t('reviews.failure'));
     } finally {
       setSubmitting(false);
     }
@@ -76,16 +78,16 @@ export default function ReviewForm() {
         <Reveal>
           <div className="text-center mb-12">
             <span className="text-xs tracking-[0.3em] uppercase text-gold mb-4 block">
-              Ihre Meinung
+              {t('reviews.opinion')}
             </span>
             <h2 className="font-display text-4xl md:text-6xl text-ivory leading-[1.05]">
-              Wie war Ihre Fahrt?
+              {t('reviews.formTitle')}
             </h2>
             <p className="mt-5 text-lunar text-lg">
-              Teilen Sie Ihre Erfahrung mit LuxDrive.
+              {t('reviews.intro')}
             </p>
             <p className="mt-2 text-lunar/80 text-sm">
-              Ihre Meinung hilft uns, unseren Service weiter zu verbessern.
+              {t('reviews.help')}
             </p>
           </div>
         </Reveal>
@@ -94,7 +96,7 @@ export default function ReviewForm() {
           <form onSubmit={submit} className="glass p-6 md:p-10 space-y-8">
             <div>
               <label htmlFor="review-name" className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-2">
-                Ihr Name
+                {t('reviews.name')}
               </label>
               <input
                 id="review-name"
@@ -110,7 +112,7 @@ export default function ReviewForm() {
 
             <fieldset>
               <legend className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-3">
-                Ihre Sternebewertung
+                {t('reviews.rating')}
               </legend>
               <div
                 className="flex flex-col items-start gap-3"
@@ -121,7 +123,7 @@ export default function ReviewForm() {
                     <button
                       key={value}
                       type="button"
-                      aria-label={value === 1 ? '1 Stern' : `${value} Sterne`}
+                      aria-label={value === 1 ? t('reviews.star') : t('reviews.stars', { count: value })}
                       aria-pressed={rating === value}
                       onClick={() => setRating(value)}
                       onMouseEnter={() => setHoveredRating(value)}
@@ -138,7 +140,7 @@ export default function ReviewForm() {
                 </div>
                 {rating > 0 && (
                   <span className="text-sm text-lunar" aria-live="polite">
-                    {rating} von 5 Sternen
+                    {t('reviews.ratingValue', { count: rating })}
                   </span>
                 )}
               </div>
@@ -146,7 +148,7 @@ export default function ReviewForm() {
 
             <div>
               <label htmlFor="review-text" className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-2">
-                Ihre Bewertung
+                {t('reviews.review')}
               </label>
               <textarea
                 id="review-text"
@@ -156,16 +158,16 @@ export default function ReviewForm() {
                 maxLength={1000}
                 required
                 rows={5}
-                placeholder="Wie war Ihre Fahrt mit LuxDrive?"
+                placeholder={t('reviews.placeholder')}
                 className="w-full bg-transparent border border-white/15 focus:border-gold p-4 text-ivory placeholder:text-lunar/60 outline-none resize-none transition-colors"
               />
             </div>
 
             {success && (
               <div className="border border-gold/30 bg-gold/5 p-5" role="status">
-                <p className="text-gold font-medium">Vielen Dank für Ihre Bewertung!</p>
+                <p className="text-gold font-medium">{t('reviews.thanks')}</p>
                 <p className="text-lunar text-sm mt-1">
-                  Ihre Bewertung wurde erfolgreich übermittelt und wird nach Prüfung veröffentlicht.
+                  {t('reviews.moderation')}
                 </p>
               </div>
             )}
@@ -175,7 +177,7 @@ export default function ReviewForm() {
               disabled={submitting}
               className="w-full h-14 bg-gold text-obsidian text-xs tracking-[0.25em] uppercase hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? 'Bewertung wird gesendet …' : 'Bewertung absenden'}
+              {submitting ? t('reviews.submitting') : t('reviews.submit')}
             </button>
           </form>
         </Reveal>

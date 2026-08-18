@@ -2,19 +2,21 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { Image } from '@/components/ui/image';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const HERO_IMG = '/images/hero-luxury-vehicle.png';
 
 export default function Hero({ content }) {
-  const headline = content?.hero_headline || 'Ihr VIP Taxi für jede Fahrt';
-  const subheadline = content?.hero_subheadline || 'Exklusive VIP Taxi Services für Flughafentransfers, Geschäftstermine, Events und individuelle Fahrten. Komfortabel, diskret und zuverlässig.';
+  const { t } = useLanguage();
+  const headline = content?.hero_headline || t('hero.defaultTitle');
+  const subheadline = content?.hero_subheadline || t('hero.defaultSubtitle');
 
   return (
     <section className="relative h-screen min-h-[600px] supports-[height:100svh]:h-svh sm:min-h-[640px] w-full overflow-hidden">
       <div className="absolute inset-0">
         <Image
           src={HERO_IMG}
-          alt="Luxuriöses VIP-Fahrzeug in der Abenddämmerung"
+          alt={t('hero.imageAlt')}
           fittingType="fill"
           className="h-full w-full animate-slow-zoom"
         />
@@ -50,7 +52,7 @@ export default function Hero({ content }) {
           <Link to="/booking" className="group flex items-center justify-between gap-4">
             <div>
               <span className="block text-xs tracking-[0.25em] uppercase text-gold mb-1">VIP Taxi</span>
-              <span className="font-display text-2xl text-ivory">Jetzt VIP Taxi buchen</span>
+              <span className="font-display text-2xl text-ivory">{t('common.bookVipTaxi')}</span>
             </div>
             <ChevronRight className="text-gold transition-transform duration-300 group-hover:translate-x-1" size={22} />
           </Link>
@@ -58,7 +60,7 @@ export default function Hero({ content }) {
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
-        <span className="text-[10px] tracking-[0.3em] uppercase text-lunar">Scrollen</span>
+        <span className="text-[10px] tracking-[0.3em] uppercase text-lunar">{t('hero.scroll')}</span>
         <span className="h-10 w-px bg-gradient-to-b from-gold/60 to-transparent" />
       </div>
     </section>

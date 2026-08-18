@@ -7,10 +7,12 @@ import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import { safeReturnTo } from "@/lib/authReturnTo";
 import { useAuth } from "@/lib/AuthContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
     if (password !== confirmPassword) {
-      setError("Die Passwörter stimmen nicht überein");
+      setError(t('auth.register.mismatch'));
       return;
     }
     setLoading(true);
@@ -45,20 +47,16 @@ export default function Register() {
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          response.status === 409
-            ? "Ein Konto mit dieser E-Mail-Adresse existiert bereits"
-            : "Registrierung fehlgeschlagen"
-        );
+        throw new Error(response.status === 409 ? "ACCOUNT_EXISTS" : "REGISTER_FAILED");
       }
 
       login(result.user, result.token);
       navigate(safeReturnTo(), { replace: true });
     } catch (err) {
       setError(
-        err.message === "Ein Konto mit dieser E-Mail-Adresse existiert bereits"
-          ? err.message
-          : "Registrierung fehlgeschlagen"
+        err.message === "ACCOUNT_EXISTS"
+          ? t('auth.register.exists')
+          : t('auth.register.failed')
       );
     } finally {
       setLoading(false);
@@ -68,16 +66,16 @@ export default function Register() {
   return (
     <AuthLayout
       icon={UserPlus}
-      title="Konto erstellen"
-      subtitle="Registrieren Sie sich, um zu beginnen"
+      title={t('auth.register.title')}
+      subtitle={t('auth.register.subtitle')}
       footer={
         <>
-          Sie haben bereits ein Konto?{" "}
+          {t('auth.register.hasAccount')}{" "}
           <Link
             to={"/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
             className="text-primary font-medium hover:underline"
           >
-            Anmelden
+            {t('auth.register.login')}
           </Link>
         </>
       }
@@ -90,7 +88,7 @@ export default function Register() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="full-name">Vollständiger Name</Label>
+          <Label htmlFor="full-name">{t('auth.register.fullName')}</Label>
           <div className="relative">
             <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -98,7 +96,7 @@ export default function Register() {
               type="text"
               autoComplete="name"
               autoFocus
-              placeholder="Ihr vollständiger Name"
+              placeholder={t('auth.register.fullNamePlaceholder')}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="pl-10 h-12"
@@ -107,7 +105,7 @@ export default function Register() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">E-Mail</Label>
+          <Label htmlFor="email">{t('common.email')}</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -123,7 +121,7 @@ export default function Register() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Passwort</Label>
+          <Label htmlFor="password">{t('auth.register.password')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -139,7 +137,7 @@ export default function Register() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm">Passwort bestätigen</Label>
+          <Label htmlFor="confirm">{t('auth.register.confirm')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -158,10 +156,10 @@ export default function Register() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Konto wird erstellt …
+              {t('auth.register.loading')}
             </>
           ) : (
-            "Konto erstellen"
+            t('auth.register.submit')
           )}
         </Button>
       </form>

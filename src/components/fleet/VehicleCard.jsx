@@ -1,8 +1,10 @@
 import { Users, Briefcase, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Image } from '@/components/ui/image';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export default function VehicleCard({ vehicle }) {
+  const { t } = useLanguage();
   return (
     <div className="group glass overflow-hidden flex flex-col">
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
@@ -12,7 +14,7 @@ export default function VehicleCard({ vehicle }) {
         <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 via-transparent to-transparent" />
         {!vehicle.available && (
           <div className="absolute top-4 right-4 bg-obsidian/80 border border-white/10 px-3 py-1 text-[10px] tracking-[0.2em] uppercase text-lunar">
-            Nicht verfügbar
+            {t('fleet.unavailable')}
           </div>
         )}
         {vehicle.category && (
@@ -28,10 +30,10 @@ export default function VehicleCard({ vehicle }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 pb-6 border-b border-white/5">
           <div className="flex items-center gap-2 text-lunar text-sm">
-            <Users size={16} className="text-gold" /> {vehicle.passenger_capacity} Fahrgäste
+            <Users size={16} className="text-gold" /> {t('fleet.passengers', { count: vehicle.passenger_capacity })}
           </div>
           <div className="flex items-center gap-2 text-lunar text-sm">
-            <Briefcase size={16} className="text-gold" /> {vehicle.luggage_capacity} Gepäck
+            <Briefcase size={16} className="text-gold" /> {t('fleet.luggage', { count: vehicle.luggage_capacity })}
           </div>
         </div>
 
@@ -47,7 +49,7 @@ export default function VehicleCard({ vehicle }) {
 
         <div className="mt-auto flex flex-col items-stretch gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-1">Ab</span>
+            <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-1">{t('fleet.startingAt')}</span>
             <span className="font-display text-3xl text-gold">${vehicle.starting_price}</span>
           </div>
           <Link
@@ -58,7 +60,7 @@ export default function VehicleCard({ vehicle }) {
                 : 'border border-white/10 text-lunar pointer-events-none opacity-50'
             }`}
           >
-            Dieses Fahrzeug buchen
+            {t('fleet.bookVehicle')}
           </Link>
         </div>
       </div>

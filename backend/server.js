@@ -20,6 +20,7 @@ if (
 const uploadRoutes = require("./routes/uploadRoutes");
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const bookingRoutes = require("./routes/bookingRoutes");
 const vehicleRoutes = require("./routes/vehicleRoutes");
@@ -31,7 +32,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 // Log every request
 app.use((req, res, next) => {
   console.log(req.method, req.url);

@@ -212,6 +212,12 @@ export default function FleetManager() {
 }
 
 function VehicleForm({ vehicle, onClose, onSave }) {
+  const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+  const ACCEPTED_IMAGE_TYPES = new Set([
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ]);
   const [form, setForm] = useState({
     ...EMPTY,
     ...vehicle,
@@ -219,6 +225,8 @@ function VehicleForm({ vehicle, onClose, onSave }) {
   });
 
   const [featureInput, setFeatureInput] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState('');
 
   const set = (key, value) => {
     setForm((current) => ({
@@ -245,6 +253,58 @@ function VehicleForm({ vehicle, onClose, onSave }) {
       'features',
       form.features.filter((_, i) => i !== index)
     );
+  };
+
+  const uploadImage = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    setUploadMessage('');
+
+    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
+      setUploadMessage('Bitte JPG, PNG oder WebP auswählen.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setUploadMessage('Die Bilddatei ist zu groß.');
+      event.target.value = '';
+      return;
+    }
+
+    setUploading(true);
+    setUploadMessage('Bild wird hochgeladen...');
+
+    try {
+      const body = new FormData();
+      body.append('image', file);
+
+      const response = await adminFetch(apiUrl('/api/upload'), {
+        method: 'POST',
+        body,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+
+      if (!result.image_url) {
+        throw new Error('Upload response incomplete');
+      }
+
+      set('image_url', result.image_url);
+      setUploadMessage('Bild erfolgreich hochgeladen.');
+    } catch (error) {
+      console.error(error);
+      setUploadMessage('Bild konnte nicht hochgeladen werden.');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
   };
 
   const cls =
@@ -307,7 +367,23 @@ function VehicleForm({ vehicle, onClose, onSave }) {
           </div>
 
           <div>
-            <label className={lbl}>Bild-URL</label>
+            <label className={lbl}>Fahrzeugbild</label>
+
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={uploadImage}
+              disabled={uploading}
+              className="block w-full min-h-11 text-sm text-lunar file:mr-3 file:min-h-11 file:border-0 file:bg-gold file:px-4 file:text-xs file:tracking-[0.12em] file:uppercase file:text-obsidian hover:file:bg-gold-light disabled:opacity-60"
+            />
+
+            {uploadMessage && (
+              <p className="mt-2 text-xs text-lunar" role="status">
+                {uploadMessage}
+              </p>
+            )}
+
+            <label className={`${lbl} mt-4`}>Bild-URL (optional)</label>
             <input
               className={cls}
               value={form.image_url || ''}
@@ -453,7 +529,8 @@ function VehicleForm({ vehicle, onClose, onSave }) {
           <div className="flex gap-3 pt-4">
             <button
               onClick={() => onSave(form)}
-              className="flex-1 h-11 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light"
+              disabled={uploading}
+              className="flex-1 h-11 bg-gold text-obsidian text-xs tracking-[0.2em] uppercase hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
             >
               Fahrzeug speichern
             </button>

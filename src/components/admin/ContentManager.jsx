@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminFetch } from '@/lib/adminFetch';
+import { apiUrl } from '@/lib/apiConfig';
 
 export default function ContentManager() {
   const [content, setContent] = useState(null);
@@ -12,7 +13,7 @@ export default function ContentManager() {
     try {
       // Testimonials now come from our Express backend.
       const testimonialResponse = await adminFetch(
-        "http://localhost:5000/api/testimonials/admin"
+        apiUrl("/api/testimonials/admin")
       );
 
       if (!testimonialResponse.ok) {
@@ -34,7 +35,7 @@ export default function ContentManager() {
 
       try {
         const contentResponse = await fetch(
-          "http://localhost:5000/api/site-settings"
+          apiUrl("/api/site-settings")
         );
 
         if (!contentResponse.ok) {
@@ -72,7 +73,7 @@ export default function ContentManager() {
       };
 
       const response = await adminFetch(
-        "http://localhost:5000/api/site-settings",
+        apiUrl("/api/site-settings"),
         {
           method: "PUT",
           headers: {
@@ -109,7 +110,7 @@ export default function ContentManager() {
 
       if (data.id) {
         response = await adminFetch(
-          `http://localhost:5000/api/testimonials/${data.id}`,
+          apiUrl(`/api/testimonials/${data.id}`),
           {
             method: "PUT",
             headers: {
@@ -120,7 +121,7 @@ export default function ContentManager() {
         );
       } else {
         response = await adminFetch(
-          "http://localhost:5000/api/testimonials",
+          apiUrl("/api/testimonials"),
           {
             method: "POST",
             headers: {
@@ -150,7 +151,7 @@ export default function ContentManager() {
 
     try {
       const response = await adminFetch(
-        `http://localhost:5000/api/testimonials/${id}`,
+        apiUrl(`/api/testimonials/${id}`),
         {
           method: "DELETE",
         }
@@ -173,7 +174,7 @@ export default function ContentManager() {
 
     try {
       const response = await adminFetch(
-        `http://localhost:5000/api/testimonials/${testimonial.id}/approval`,
+        apiUrl(`/api/testimonials/${testimonial.id}/approval`),
         {
           method: "PATCH",
           headers: {

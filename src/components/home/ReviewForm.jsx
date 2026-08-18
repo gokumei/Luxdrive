@@ -3,8 +3,9 @@ import { Star } from 'lucide-react';
 import { toast } from 'sonner';
 import Reveal from '@/components/Reveal';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { apiUrl } from '@/lib/apiConfig';
 
-const API_URL = 'http://localhost:5000/api/testimonials/submit';
+const API_URL = apiUrl('/api/testimonials/submit');
 
 export default function ReviewForm() {
   const { t } = useLanguage();

@@ -3,6 +3,7 @@ import { Plus, Trash2, Pencil, X } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { toast } from 'sonner';
 import { adminFetch } from '@/lib/adminFetch';
+import { apiUrl, assetUrl } from '@/lib/apiConfig';
 
 const EMPTY = {
   name: '',
@@ -26,7 +27,7 @@ export default function FleetManager() {
     try {
       setLoading(true);
 
-      const response = await fetch('http://localhost:5000/api/vehicles');
+      const response = await fetch(apiUrl('/api/vehicles'));
 
       if (!response.ok) {
         throw new Error('Fahrzeuge konnten nicht geladen werden');
@@ -61,8 +62,8 @@ export default function FleetManager() {
       };
 
       const url = data.id
-        ? `http://localhost:5000/api/vehicles/${data.id}`
-        : 'http://localhost:5000/api/vehicles';
+        ? apiUrl(`/api/vehicles/${data.id}`)
+        : apiUrl('/api/vehicles');
 
       const response = await adminFetch(url, {
         method: data.id ? 'PUT' : 'POST',
@@ -92,7 +93,7 @@ export default function FleetManager() {
 
     try {
       const response = await adminFetch(
-        `http://localhost:5000/api/vehicles/${id}`,
+        apiUrl(`/api/vehicles/${id}`),
         {
           method: 'DELETE',
         }
@@ -140,7 +141,7 @@ export default function FleetManager() {
               <div className="aspect-[4/3] bg-obsidian relative">
                 {v.image_url ? (
                   <Image
-                    src={v.image_url}
+                    src={assetUrl(v.image_url)}
                     alt={v.name}
                     fittingType="fill"
                     className="h-full w-full"
@@ -319,7 +320,7 @@ function VehicleForm({ vehicle, onClose, onSave }) {
             {form.image_url && (
               <div className="mt-3 aspect-video bg-obsidian">
                 <Image
-                  src={form.image_url}
+                  src={assetUrl(form.image_url)}
                   alt="Vorschau"
                   fittingType="fill"
                   className="h-full w-full"

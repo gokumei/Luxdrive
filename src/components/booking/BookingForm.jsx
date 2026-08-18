@@ -7,6 +7,7 @@ import { Image } from '@/components/ui/image';
 import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { localizeVehicle } from '@/i18n/dbContent';
+import { apiUrl } from '@/lib/apiConfig';
 
 const STEP_KEYS = ['booking.steps.journey', 'booking.steps.vehicle', 'booking.steps.contact'];
 
@@ -78,7 +79,7 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
 
     console.log("Sending booking...");
 
-    const response = await fetch("http://localhost:5000/api/bookings", {
+    const response = await fetch(apiUrl("/api/bookings"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

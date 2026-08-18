@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { apiUrl } from "@/lib/apiConfig";
 
 export default function ForgotPassword() {
   const { t } = useLanguage();
@@ -22,7 +23,7 @@ export default function ForgotPassword() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/forgot-password",
+        apiUrl("/api/auth/forgot-password"),
         {
           method: "POST",
           headers: {

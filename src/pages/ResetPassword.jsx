@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Lock, Loader2, AlertTriangle } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { apiUrl } from "@/lib/apiConfig";
 
 export default function ResetPassword() {
   const { t } = useLanguage();
@@ -28,7 +29,7 @@ export default function ResetPassword() {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/reset-password",
+        apiUrl("/api/auth/reset-password"),
         {
           method: "POST",
           headers: {

@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { Search, X, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { adminFetch } from "@/lib/adminFetch";
+import { apiUrl } from "@/lib/apiConfig";
 
-const API_URL = "http://localhost:5000/api/bookings";
+const API_URL = apiUrl("/api/bookings");
 
 const STATUSES = ["pending", "confirmed", "completed", "cancelled"];
 

@@ -8,6 +8,7 @@ import AuthLayout from "@/components/AuthLayout";
 import { safeReturnTo } from "@/lib/authReturnTo";
 import { useAuth } from "@/lib/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { apiUrl } from "@/lib/apiConfig";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function Register() {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/register",
+        apiUrl("/api/auth/register"),
         {
           method: "POST",
           headers: {

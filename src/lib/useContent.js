@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl, assetUrl } from '@/lib/apiConfig';
 
 /**
  * @typedef {{
@@ -27,7 +28,7 @@ export function useSiteContent() {
   useEffect(() => {
     let active = true;
 
-    fetch("http://localhost:5000/api/site-settings")
+    fetch(apiUrl("/api/site-settings"))
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to load site content");
@@ -61,7 +62,7 @@ export function useVehicles() {
   useEffect(() => {
     let active = true;
 
-    fetch("http://localhost:5000/api/vehicles")
+    fetch(apiUrl("/api/vehicles"))
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to load vehicles");
@@ -84,11 +85,7 @@ export function useVehicles() {
             features: Array.isArray(vehicle.features)
               ? vehicle.features
               : [],
-            image_url:
-              typeof vehicle.image_url === "string" &&
-              vehicle.image_url.startsWith("/uploads/")
-                ? `http://localhost:5000${vehicle.image_url}`
-                : vehicle.image_url,
+            image_url: assetUrl(vehicle.image_url),
           }));
 
           setVehicles(normalizedVehicles);
@@ -123,7 +120,7 @@ export function useTestimonials() {
   useEffect(() => {
     let active = true;
 
-    fetch("http://localhost:5000/api/testimonials")
+    fetch(apiUrl("/api/testimonials"))
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to load testimonials");

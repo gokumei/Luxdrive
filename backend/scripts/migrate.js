@@ -63,14 +63,20 @@ function parseDatabaseArgument(argv) {
 function connectionOptions(database) {
   const options = {
     host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
+    user: process.env.DB_MIGRATION_USER,
+    password: process.env.DB_MIGRATION_PASSWORD,
     charset: "utf8mb4",
     multipleStatements: true,
   };
 
   if (database) options.database = database;
   return options;
+}
+
+function assertMigrationCredentialsConfigured() {
+  if (!process.env.DB_MIGRATION_USER || !process.env.DB_MIGRATION_PASSWORD) {
+    throw new Error("migration database credentials are not configured");
+  }
 }
 
 async function discoverMigrations() {
@@ -162,6 +168,7 @@ async function createMigrationTable(connection) {
 
 async function run() {
   const database = parseDatabaseArgument(process.argv.slice(2));
+  assertMigrationCredentialsConfigured();
   const migrations = await discoverMigrations();
   let serverConnection;
   let databaseConnection;

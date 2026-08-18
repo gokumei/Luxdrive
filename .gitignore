@@ -31,4 +31,8 @@ dist-ssr
 .env
 .vite
 
+# Runtime vehicle uploads
+/backend/uploads/*
+!/backend/uploads/.gitkeep
+
 /src/generated/prisma

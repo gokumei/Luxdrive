@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { localizeVehicle } from '@/i18n/dbContent';
 import { apiUrl } from '@/lib/apiConfig';
+import { formatPrice } from '@/lib/formatPrice';
+import GeoapifyAddressInput from '@/components/booking/GeoapifyAddressInput';
 
 const STEP_KEYS = ['booking.steps.journey', 'booking.steps.vehicle', 'booking.steps.contact'];
 
@@ -152,10 +154,10 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
           <motion.div key="journey" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <Field id="booking-pickup" icon={MapPin} label={t('booking.pickup')}>
-                <input id="booking-pickup" autoComplete="street-address" className={inputCls} value={form.pickup_location} onChange={(e) => set('pickup_location', e.target.value)} placeholder={t('booking.pickupPlaceholder')} />
+                <GeoapifyAddressInput id="booking-pickup" className={inputCls} value={form.pickup_location} onChange={(value) => set('pickup_location', value)} placeholder={t('booking.pickupPlaceholder')} language={language} />
               </Field>
               <Field id="booking-destination" icon={MapPin} label={t('booking.destination')}>
-                <input id="booking-destination" autoComplete="off" className={inputCls} value={form.destination} onChange={(e) => set('destination', e.target.value)} placeholder={t('booking.destinationPlaceholder')} />
+                <GeoapifyAddressInput id="booking-destination" className={inputCls} value={form.destination} onChange={(value) => set('destination', value)} placeholder={t('booking.destinationPlaceholder')} language={language} />
               </Field>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -193,7 +195,7 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
                   <div className="p-4">
                     <div className="font-display text-lg text-ivory">{v.name}</div>
                     <div className="text-xs text-lunar mt-1">{t('fleet.passengers', { count: v.passenger_capacity })} · {t('fleet.luggagePieces', { count: v.luggage_capacity })}</div>
-                    <div className="text-gold font-display text-xl mt-2">${v.starting_price}</div>
+                    <div className="text-gold font-display text-xl mt-2">{formatPrice(v.starting_price, language)}</div>
                   </div>
                   {form.vehicle === v.name && (
                     <div className="absolute top-3 right-3 h-6 w-6 rounded-full bg-gold flex items-center justify-center"><Check size={14} className="text-obsidian" /></div>
@@ -232,7 +234,7 @@ export default function BookingForm({ presetVehicle, onSuccess }) {
       <div className="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="text-left self-start sm:self-auto">
           <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar">{t('booking.estimatedPrice')}</span>
-          <span className="font-display text-3xl text-gold">{estimatedPrice ? `$${estimatedPrice}` : '—'}</span>
+          <span className="font-display text-3xl text-gold">{estimatedPrice ? formatPrice(estimatedPrice, language) : '—'}</span>
         </div>
         <div className="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:items-center">
           {step > 0 && (

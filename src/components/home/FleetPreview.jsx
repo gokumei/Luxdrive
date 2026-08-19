@@ -5,6 +5,7 @@ import Reveal from '@/components/Reveal';
 import { useVehicles } from '@/lib/useContent';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { localizeVehicle } from '@/i18n/dbContent';
+import { formatPrice } from '@/lib/formatPrice';
 
 export default function FleetPreview() {
   const { language, t } = useLanguage();
@@ -46,7 +47,7 @@ export default function FleetPreview() {
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
                   <span className="text-xs tracking-[0.2em] uppercase text-lunar">{t('fleet.startingAt')}</span>
-                  <span className="font-display text-2xl text-gold">${v.starting_price}</span>
+                  <span className="font-display text-2xl text-gold">{formatPrice(v.starting_price, language)}</span>
                 </div>
               </Link>
             </Reveal>

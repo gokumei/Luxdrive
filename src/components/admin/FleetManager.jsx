@@ -4,6 +4,7 @@ import { Image } from '@/components/ui/image';
 import { toast } from 'sonner';
 import { adminFetch } from '@/lib/adminFetch';
 import { apiUrl, assetUrl } from '@/lib/apiConfig';
+import { formatPrice } from '@/lib/formatPrice';
 
 const EMPTY = {
   name: '',
@@ -185,8 +186,7 @@ export default function FleetManager() {
 
                 <div className="text-lunar text-xs mt-1">
                   {v.passenger_capacity} Fahrgäste ·{' '}
-                  {v.luggage_capacity} Gepäckstücke · $
-                  {v.starting_price}
+                  {v.luggage_capacity} Gepäckstücke · {formatPrice(v.starting_price, 'de')}
                 </div>
 
                 {v.category && (
@@ -437,7 +437,7 @@ function VehicleForm({ vehicle, onClose, onSave }) {
             </div>
 
             <div>
-              <label className={lbl}>Preis ab</label>
+              <label className={lbl}>Preis ab (€)</label>
               <input
                 type="number"
                 className={cls}

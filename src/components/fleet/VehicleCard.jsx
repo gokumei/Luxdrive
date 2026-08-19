@@ -2,9 +2,10 @@ import { Users, Briefcase, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Image } from '@/components/ui/image';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { formatPrice } from '@/lib/formatPrice';
 
 export default function VehicleCard({ vehicle }) {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   return (
     <div className="group glass overflow-hidden flex flex-col">
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
@@ -50,7 +51,7 @@ export default function VehicleCard({ vehicle }) {
         <div className="mt-auto flex flex-col items-stretch gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <span className="block text-[10px] tracking-[0.25em] uppercase text-lunar mb-1">{t('fleet.startingAt')}</span>
-            <span className="font-display text-3xl text-gold">${vehicle.starting_price}</span>
+            <span className="font-display text-3xl text-gold">{formatPrice(vehicle.starting_price, language)}</span>
           </div>
           <Link
             to={`/booking/${encodeURIComponent(vehicle.name)}`}

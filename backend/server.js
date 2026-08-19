@@ -29,6 +29,7 @@ const vehicleRoutes = require("./routes/vehicleRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
 const authRoutes = require("./routes/authRoutes");
 const siteSettingsRoutes = require("./routes/siteSettingsRoutes");
+const contactMessageRoutes = require("./routes/contactMessageRoutes");
 const app = express();
 
 app.use(cors());
@@ -46,6 +47,7 @@ app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/site-settings", siteSettingsRoutes);
+app.use("/api/contact-messages", contactMessageRoutes);
 
 app.get("/", (req, res) => {
   res.json({

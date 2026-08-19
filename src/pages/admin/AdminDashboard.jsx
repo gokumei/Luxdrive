@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { CalendarClock, Car, FileText, LogOut, ShieldAlert } from 'lucide-react';
+import { CalendarClock, Car, FileText, LogOut, Mail, ShieldAlert } from 'lucide-react';
 import BookingsManager from '@/components/admin/BookingsManager';
 import FleetManager from '@/components/admin/FleetManager';
 import ContentManager from '@/components/admin/ContentManager';
+import MessagesManager from '@/components/admin/MessagesManager';
 
 const TABS = [
   { key: 'bookings', label: 'Buchungen', icon: CalendarClock },
   { key: 'fleet', label: 'Flotte', icon: Car },
-  { key: 'content', label: 'Inhalte', icon: FileText }
+  { key: 'content', label: 'Inhalte', icon: FileText },
+  { key: 'messages', label: 'Nachrichten', icon: Mail }
 ];
 
 export default function AdminDashboard() {
@@ -71,11 +73,13 @@ export default function AdminDashboard() {
             {tab === 'bookings' && 'Alle Buchungen anzeigen, durchsuchen und verwalten.'}
             {tab === 'fleet' && 'Fahrzeuge hinzufügen, bearbeiten und verwalten.'}
             {tab === 'content' && 'Website-Texte, Kontaktdaten und Kundenbewertungen bearbeiten.'}
+            {tab === 'messages' && 'Kontaktanfragen anzeigen und verwalten.'}
           </p>
         </div>
         {tab === 'bookings' && <BookingsManager />}
         {tab === 'fleet' && <FleetManager />}
         {tab === 'content' && <ContentManager />}
+        {tab === 'messages' && <MessagesManager />}
       </main>
     </div>
   );

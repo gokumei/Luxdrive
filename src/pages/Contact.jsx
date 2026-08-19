@@ -4,6 +4,7 @@ import Reveal from '@/components/Reveal';
 import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { apiUrl } from '@/lib/apiConfig';
 
 export default function Contact() {
   const { t } = useLanguage();
@@ -20,16 +21,25 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sending, setSending] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) { toast.error(t('contact.allFields')); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) { toast.error(t('contact.invalidEmail')); return; }
     setSending(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch(apiUrl('/api/contact-messages'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!response.ok) throw new Error('CONTACT_SUBMIT_FAILED');
       setSending(false);
       toast.success(t('contact.sent'));
       setForm({ name: '', email: '', message: '' });
-    }, 900);
+    } catch {
+      setSending(false);
+      toast.error(t('contact.sendFailed'));
+    }
   };
 
   return (

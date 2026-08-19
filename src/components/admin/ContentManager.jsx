@@ -3,11 +3,14 @@ import { Plus, Trash2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminFetch } from '@/lib/adminFetch';
 import { apiUrl } from '@/lib/apiConfig';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 
 export default function ContentManager() {
   const [content, setContent] = useState(null);
   const [testimonials, setTestimonials] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = async () => {
     try {
@@ -147,7 +150,7 @@ export default function ContentManager() {
   };
 
   const removeTestimonial = async (id) => {
-    if (!confirm("Möchten Sie diese Kundenbewertung löschen?")) return;
+    setDeleting(true);
 
     try {
       const response = await adminFetch(
@@ -166,6 +169,9 @@ export default function ContentManager() {
     } catch (err) {
       console.error(err);
       toast.error("Kundenbewertung konnte nicht gelöscht werden");
+    } finally {
+      setDeleting(false);
+      setPendingDelete(null);
     }
   };
 
@@ -426,7 +432,7 @@ export default function ContentManager() {
                 </button>
 
                 <button
-                  onClick={() => removeTestimonial(t.id)}
+                  onClick={() => setPendingDelete(t.id)}
                   aria-label="Bewertung löschen"
                   className="h-8 w-8 border border-white/10 flex items-center justify-center text-lunar hover:text-red-400"
                 >
@@ -530,6 +536,15 @@ export default function ContentManager() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        title="Bewertung löschen?"
+        message="Möchten Sie diese Kundenbewertung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        loading={deleting}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => removeTestimonial(pendingDelete)}
+      />
     </div>
   );
 }

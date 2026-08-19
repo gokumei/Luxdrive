@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { adminFetch } from '@/lib/adminFetch';
 import { apiUrl, assetUrl } from '@/lib/apiConfig';
 import { formatPrice } from '@/lib/formatPrice';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 
 const EMPTY = {
   name: '',
@@ -23,6 +24,8 @@ export default function FleetManager() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = async () => {
     try {
@@ -90,7 +93,7 @@ export default function FleetManager() {
   };
 
   const remove = async (id) => {
-    if (!confirm('Möchten Sie dieses Fahrzeug löschen?')) return;
+    setDeleting(true);
 
     try {
       const response = await adminFetch(
@@ -165,7 +168,7 @@ export default function FleetManager() {
                   </button>
 
                   <button
-                    onClick={() => remove(v.id)}
+                    onClick={() => setPendingDelete(v.id)}
                     className="h-8 w-8 bg-obsidian/80 border border-white/10 flex items-center justify-center text-lunar hover:text-red-400"
                   >
                     <Trash2 size={14} />
@@ -207,6 +210,15 @@ export default function FleetManager() {
           onSave={save}
         />
       )}
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        title="Fahrzeug löschen?"
+        message="Möchten Sie dieses Fahrzeug wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        loading={deleting}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => remove(pendingDelete)}
+      />
     </div>
   );
 }

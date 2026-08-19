@@ -3,6 +3,7 @@ import { Search, X, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { adminFetch } from "@/lib/adminFetch";
 import { apiUrl } from "@/lib/apiConfig";
+import ConfirmModal from "@/components/admin/ConfirmModal";
 
 const API_URL = apiUrl("/api/bookings");
 
@@ -45,6 +46,8 @@ export default function BookingsManager() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [selected, setSelected] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = async () => {
     try {
@@ -146,10 +149,7 @@ export default function BookingsManager() {
   };
 
   const remove = async (id) => {
-    if (!window.confirm("Möchten Sie diese Buchung dauerhaft löschen?")) {
-      return;
-    }
-
+    setDeleting(true);
     try {
       const res = await adminFetch(`${API_URL}/${id}`, {
         method: "DELETE",
@@ -169,6 +169,9 @@ export default function BookingsManager() {
     } catch (err) {
       console.error(err);
       toast.error("Buchung konnte nicht gelöscht werden");
+    } finally {
+      setDeleting(false);
+      setPendingDelete(null);
     }
   };
 
@@ -396,13 +399,22 @@ export default function BookingsManager() {
             updateStatus(selected.id, status)
           }
           onDelete={() =>
-            remove(selected.id)
+            setPendingDelete(selected.id)
           }
           onSave={(data) =>
             saveEdit(selected.id, data)
           }
         />
       )}
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        title="Buchung löschen?"
+        message="Möchten Sie diese Buchung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        loading={deleting}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => remove(pendingDelete)}
+      />
     </div>
   );
 }

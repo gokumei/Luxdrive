@@ -55,6 +55,131 @@ async function sendPasswordResetEmail(recipientEmail, resetUrl) {
   }
 }
 
+const BOOKING_EMAIL_CONTENT = {
+  received: {
+    subject: "Buchungsanfrage erhalten | Booking request received",
+    heading: "Buchungsanfrage erhalten",
+    german:
+      "Vielen Dank für Ihre Buchungsanfrage. Wir haben Ihre Anfrage erhalten und melden uns nach der Prüfung bei Ihnen.",
+    english:
+      "Thank you for your booking request. We have received it and will contact you after review.",
+  },
+  confirmed: {
+    subject: "Buchung bestätigt | Booking confirmed",
+    heading: "Buchung bestätigt",
+    german: "Ihre Buchung wurde bestätigt. Wir freuen uns, Sie zu fahren.",
+    english: "Your booking has been confirmed. We look forward to driving you.",
+  },
+  cancelled: {
+    subject: "Buchung storniert | Booking cancelled",
+    heading: "Buchung storniert",
+    german:
+      "Ihre Buchung wurde storniert. Wenn Sie Fragen haben oder eine neue Fahrt wünschen, kontaktieren Sie uns bitte.",
+    english:
+      "Your booking has been cancelled. Please contact us if you have questions or would like to arrange another journey.",
+  },
+};
+
+function formatBookingDate(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return new Intl.DateTimeFormat("de-DE", { timeZone: "UTC" }).format(value);
+  }
+
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return match ? `${match[3]}.${match[2]}.${match[1]}` : String(value);
+}
+
+function formatBookingTime(value) {
+  const match = String(value).match(/^(\d{2}:\d{2})/);
+  return match ? match[1] : String(value);
+}
+
+function bookingDetailsText(booking) {
+  const details = [
+    ["Name", booking.customer_name],
+    ["Abholung / Pickup", booking.pickup_location],
+    ["Ziel / Destination", booking.dropoff_location],
+    ["Datum / Date", formatBookingDate(booking.pickup_date)],
+    ["Uhrzeit / Time", formatBookingTime(booking.pickup_time)],
+  ];
+
+  if (booking.vehicle) {
+    details.push(["Fahrzeug / Vehicle", booking.vehicle]);
+  }
+
+  return details.map(([label, value]) => `${label}: ${value}`).join("\n");
+}
+
+function bookingDetailsHtml(booking) {
+  const details = [
+    ["Name", booking.customer_name],
+    ["Abholung / Pickup", booking.pickup_location],
+    ["Ziel / Destination", booking.dropoff_location],
+    ["Datum / Date", formatBookingDate(booking.pickup_date)],
+    ["Uhrzeit / Time", formatBookingTime(booking.pickup_time)],
+  ];
+
+  if (booking.vehicle) {
+    details.push(["Fahrzeug / Vehicle", booking.vehicle]);
+  }
+
+  return details
+    .map(
+      ([label, value]) => `
+        <tr>
+          <th style="padding: 8px 12px; text-align: left; vertical-align: top; color: #6b7280; font-weight: 600;">${escapeHtml(label)}</th>
+          <td style="padding: 8px 12px;">${escapeHtml(value)}</td>
+        </tr>`
+    )
+    .join("");
+}
+
+async function sendBookingEmail(recipientEmail, booking, type) {
+  const content = BOOKING_EMAIL_CONTENT[type];
+
+  if (!content) {
+    throw new Error("Unsupported booking email type");
+  }
+
+  const { error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to: recipientEmail,
+    subject: content.subject,
+    text: [
+      `Guten Tag ${booking.customer_name},`,
+      "",
+      content.german,
+      "",
+      `Hello ${booking.customer_name},`,
+      "",
+      content.english,
+      "",
+      bookingDetailsText(booking),
+      "",
+      "LuxDrive",
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.6; max-width: 640px; margin: 0 auto;">
+        <h1 style="font-size: 24px; margin-bottom: 16px;">${escapeHtml(content.heading)}</h1>
+        <p>Guten Tag ${escapeHtml(booking.customer_name)},</p>
+        <p>${escapeHtml(content.german)}</p>
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+        <p>Hello ${escapeHtml(booking.customer_name)},</p>
+        <p>${escapeHtml(content.english)}</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 24px 0; background: #f9fafb;">
+          ${bookingDetailsHtml(booking)}
+        </table>
+        <p style="margin-top: 24px;">LuxDrive</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    throw new Error("Booking email delivery failed");
+  }
+}
+
 module.exports = {
+  sendBookingEmail,
   sendPasswordResetEmail,
 };

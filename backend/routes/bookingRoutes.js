@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { sendBookingEmail } = require("../lib/mailer");
 const {
   authenticateToken,
   requireAdmin,
@@ -58,8 +59,6 @@ router.get("/", authenticateToken, requireAdmin, async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  console.log("BODY:", req.body);
-
   try {
     const {
       customer_name,
@@ -75,7 +74,6 @@ router.post("/", async (req, res) => {
       vehicle_id,
     } = req.body; 
 
-    console.log("Running INSERT...");
     const [result] = await db.query(
 
       `INSERT INTO bookings (
@@ -105,7 +103,35 @@ router.post("/", async (req, res) => {
         vehicle_id,
       ]
     );
-    console.log("INSERT SUCCESS:", result);
+
+    try {
+      const [bookings] = await db.query(
+        `SELECT
+           b.customer_name,
+           b.customer_email,
+           b.pickup_location,
+           b.dropoff_location,
+           b.pickup_date,
+           b.pickup_time,
+           v.name AS vehicle
+         FROM bookings b
+         LEFT JOIN vehicles v ON b.vehicle_id = v.id
+         WHERE b.id = ?
+         LIMIT 1`,
+        [result.insertId]
+      );
+
+      if (bookings[0]) {
+        await sendBookingEmail(
+          bookings[0].customer_email,
+          bookings[0],
+          "received"
+        );
+      }
+    } catch {
+      console.error("BOOKING RECEIVED EMAIL DELIVERY ERROR");
+    }
+
     res.status(201).json({
       message: "Booking created",
       id: result.insertId,
@@ -142,17 +168,55 @@ router.patch(
     }
 
     try {
-      const [result] = await db.query(
-        `UPDATE bookings
-         SET status = ?
-         WHERE id = ?`,
-        [req.body.status, bookingId]
+      const [bookings] = await db.query(
+        `SELECT
+           b.status,
+           b.customer_name,
+           b.customer_email,
+           b.pickup_location,
+           b.dropoff_location,
+           b.pickup_date,
+           b.pickup_time,
+           v.name AS vehicle
+         FROM bookings b
+         LEFT JOIN vehicles v ON b.vehicle_id = v.id
+         WHERE b.id = ?
+         LIMIT 1`,
+        [bookingId]
       );
 
-      if (result.affectedRows === 0) {
+      if (bookings.length === 0) {
         return res.status(404).json({
           message: "Booking not found",
         });
+      }
+
+      const booking = bookings[0];
+      const statusChanged = booking.status !== req.body.status;
+
+      if (statusChanged) {
+        const [result] = await db.query(
+          `UPDATE bookings
+           SET status = ?
+           WHERE id = ? AND status = ?`,
+          [req.body.status, bookingId, booking.status]
+        );
+
+        if (result.affectedRows === 1) {
+          booking.status = req.body.status;
+
+          if (["confirmed", "cancelled"].includes(req.body.status)) {
+            try {
+              await sendBookingEmail(
+                booking.customer_email,
+                booking,
+                req.body.status
+              );
+            } catch {
+              console.error("BOOKING STATUS EMAIL DELIVERY ERROR");
+            }
+          }
+        }
       }
 
       return res.status(200).json({
@@ -186,7 +250,13 @@ router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
       vehicle_id,
     } = req.body;
 
-    await db.query(
+    const [existingBookings] = await db.query(
+      "SELECT status FROM bookings WHERE id = ? LIMIT 1",
+      [req.params.id]
+    );
+    const previousStatus = existingBookings[0]?.status;
+
+    const [result] = await db.query(
       `UPDATE bookings
        SET
          customer_name = ?,
@@ -216,6 +286,41 @@ router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
         req.params.id,
       ]
     );
+
+    if (
+      result.affectedRows === 1 &&
+      previousStatus &&
+      previousStatus !== status &&
+      ["confirmed", "cancelled"].includes(status)
+    ) {
+      try {
+        const [bookings] = await db.query(
+          `SELECT
+             b.customer_name,
+             b.customer_email,
+             b.pickup_location,
+             b.dropoff_location,
+             b.pickup_date,
+             b.pickup_time,
+             v.name AS vehicle
+           FROM bookings b
+           LEFT JOIN vehicles v ON b.vehicle_id = v.id
+           WHERE b.id = ?
+           LIMIT 1`,
+          [req.params.id]
+        );
+
+        if (bookings[0]) {
+          await sendBookingEmail(
+            bookings[0].customer_email,
+            bookings[0],
+            status
+          );
+        }
+      } catch {
+        console.error("BOOKING STATUS EMAIL DELIVERY ERROR");
+      }
+    }
 
     res.json({ message: "Booking updated" });
   } catch (err) {

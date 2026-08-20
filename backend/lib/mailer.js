@@ -179,7 +179,67 @@ async function sendBookingEmail(recipientEmail, booking, type) {
   }
 }
 
+async function sendOwnerBookingNotification(recipientEmail, booking) {
+  const specialRequests = booking.special_requests?.trim() || "Keine";
+  const customerEmail = booking.customer_email?.trim() || "Keine Angabe";
+  const customerPhone = booking.customer_phone?.trim() || "Keine Angabe";
+  const vehicle = booking.vehicle || "Keine Angabe";
+  const bookingId = booking.id || "Keine Angabe";
+  const details = [
+    ["Buchungs-ID", bookingId],
+    ["Kundenname", booking.customer_name],
+    ["E-Mail", customerEmail],
+    ["Telefon", customerPhone],
+    ["Fahrzeug", vehicle],
+    ["Abholung", booking.pickup_location],
+    ["Ziel / Drop-off", booking.dropoff_location],
+    ["Abholdatum", formatBookingDate(booking.pickup_date)],
+    ["Abholzeit", formatBookingTime(booking.pickup_time)],
+    ["Personen", booking.passengers],
+    ["Besondere Wünsche", specialRequests],
+  ];
+  const text = details.map(([label, value]) => `${label}: ${value}`).join("\n");
+  const html = details
+    .map(
+      ([label, value]) => `
+        <tr>
+          <th style="padding: 8px 12px; text-align: left; vertical-align: top; color: #6b7280; font-weight: 600;">${escapeHtml(label)}</th>
+          <td style="padding: 8px 12px;">${escapeHtml(value)}</td>
+        </tr>`
+    )
+    .join("");
+  const customerReplyEmail =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)
+      ? customerEmail
+      : undefined;
+
+  const { error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to: recipientEmail,
+    ...(customerReplyEmail ? { replyTo: customerReplyEmail } : {}),
+    subject: `Neue Buchungsanfrage – ${booking.customer_name}`,
+    text: ["Eine neue Buchungsanfrage ist eingegangen.", "", text, "", "LuxDrive"].join(
+      "\n"
+    ),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.6; max-width: 640px; margin: 0 auto;">
+        <h1 style="font-size: 24px; margin-bottom: 16px;">Neue Buchungsanfrage</h1>
+        <p>Eine neue Buchungsanfrage ist eingegangen:</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 24px 0; background: #f9fafb;">
+          ${html}
+        </table>
+        <p style="margin-top: 24px;">LuxDrive</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    throw new Error("Owner booking email delivery failed");
+  }
+}
+
 module.exports = {
   sendBookingEmail,
+  sendOwnerBookingNotification,
   sendPasswordResetEmail,
 };

@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
-const { sendBookingEmail } = require("../lib/mailer");
+const {
+  sendBookingEmail,
+  sendOwnerBookingNotification,
+} = require("../lib/mailer");
 const {
   authenticateToken,
   requireAdmin,
@@ -104,15 +107,21 @@ router.post("/", async (req, res) => {
       ]
     );
 
+    let booking;
+
     try {
       const [bookings] = await db.query(
         `SELECT
+           b.id,
            b.customer_name,
            b.customer_email,
+           b.customer_phone,
            b.pickup_location,
            b.dropoff_location,
            b.pickup_date,
            b.pickup_time,
+           b.passengers,
+           b.special_requests,
            v.name AS vehicle
          FROM bookings b
          LEFT JOIN vehicles v ON b.vehicle_id = v.id
@@ -121,15 +130,37 @@ router.post("/", async (req, res) => {
         [result.insertId]
       );
 
-      if (bookings[0]) {
+      booking = bookings[0];
+    } catch {
+      console.error("BOOKING EMAIL DATA LOAD ERROR");
+    }
+
+    if (booking) {
+      try {
         await sendBookingEmail(
-          bookings[0].customer_email,
-          bookings[0],
+          booking.customer_email,
+          booking,
           "received"
         );
+      } catch {
+        console.error("BOOKING RECEIVED EMAIL DELIVERY ERROR");
       }
-    } catch {
-      console.error("BOOKING RECEIVED EMAIL DELIVERY ERROR");
+
+      try {
+        const [settings] = await db.query(
+          "SELECT email FROM site_settings ORDER BY id ASC LIMIT 1"
+        );
+        const ownerEmail = settings[0]?.email?.trim();
+
+        if (
+          ownerEmail &&
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerEmail)
+        ) {
+          await sendOwnerBookingNotification(ownerEmail, booking);
+        }
+      } catch {
+        console.error("BOOKING OWNER EMAIL DELIVERY ERROR");
+      }
     }
 
     res.status(201).json({
